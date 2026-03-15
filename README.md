@@ -50,6 +50,11 @@
 - Text properly constrained within button bounds
 - No more overflow or stretching
 
+#### Loader
+```lua
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/JScripter-Lua/XovaModedLib/refs/heads/main/VitaLib_Enhanced.lua"))()
+```
+
 #### Fix #2: Customizable Per-Tab Banner Color
 - **New `TabImage` argument** per page:
   ```lua
