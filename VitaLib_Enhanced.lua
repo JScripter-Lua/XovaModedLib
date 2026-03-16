@@ -1,13 +1,5 @@
---[[
-    Vita UI Library - Enhanced Edition
-    Features: Full Lucide Icon System, No CoreGui, Bug Fixes, Comprehensive Element Support
-    Updated: Icon Auto-Resolution, Customizable Theme, Bindable Toggle Key, Keybind Element,
-             Notifications, Per-Tab Banner Colors, Pill Icon Customization
---]]
-
 local Library = {}
 
--- Services (CoreGui intentionally excluded)
 local Players          = game:GetService('Players')
 local RunService       = game:GetService('RunService')
 local UserInputService = game:GetService('UserInputService')
@@ -17,9 +9,6 @@ local Mobile      = UserInputService.TouchEnabled and not UserInputService.Keybo
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui   = LocalPlayer:WaitForChild("PlayerGui")
 
-------------------------------------------------------------
--- Lucide Icon System
-------------------------------------------------------------
 local Lucide = {
 	['lucide-mouse-2'] = "rbxassetid://10088146939",
 	['lucide-internet'] = "rbxassetid://12785195438",
@@ -838,9 +827,6 @@ local Lucide = {
 	["lucide-zoom-out"] = "rbxassetid://10747384679",
 }
 
-------------------------------------------------------------
--- Parent Helper (no CoreGui)
-------------------------------------------------------------
 function Library:Parent()
     if not RunService:IsStudio() then
         return (gethui and gethui()) or PlayerGui
@@ -848,11 +834,6 @@ function Library:Parent()
     return PlayerGui
 end
 
-------------------------------------------------------------
--- Utilities
-------------------------------------------------------------
-
--- Convert hex string to Color3
 function Library:Hex(hex)
     hex = hex:gsub("#", "")
     local r = tonumber(hex:sub(1, 2), 16) or 0
@@ -861,14 +842,12 @@ function Library:Hex(hex)
     return Color3.fromRGB(r, g, b)
 end
 
--- Resolve Color3 or hex string
 local function ResolveColor(v)
     if typeof(v) == "Color3" then return v end
     if type(v) == "string"   then return Library:Hex(v) end
     return v
 end
 
--- Detect executor name
 local function GetExecutorName()
     if getexecutorname then
         local ok, name = pcall(getexecutorname)
@@ -878,11 +857,6 @@ local function GetExecutorName()
         local ok, name = pcall(identifyexecutor)
         if ok and name and name ~= "" then return name end
     end
-    if syn         then return "Synapse X"  end
-    if KRNL_LOADED then return "KRNL"       end
-    if fluxus      then return "Fluxus"     end
-    if electron    then return "Electron"   end
-    if robloxmouse then return "Scriptware" end
     return "Unknown Executor"
 end
 
@@ -977,19 +951,15 @@ function Library.Effect(c, p)
     t:Play()
 end
 
--- Asset resolver with automatic Lucide icon detection
 function Library:Asset(rbx)
     if typeof(rbx) == 'number' then 
         return "rbxassetid://" .. rbx 
     end
     if typeof(rbx) == 'string' then
-        -- Auto-resolve Lucide icons: "eye" → lucide-eye, or direct lookup
         if not rbx:find('rbxassetid://') then
-            -- Try direct lookup first
             if Lucide[rbx] then
                 return Lucide[rbx]
             end
-            -- Try with lucide- prefix
             if Lucide["lucide-" .. rbx] then
                 return Lucide["lucide-" .. rbx]
             end
@@ -999,7 +969,6 @@ function Library:Asset(rbx)
     return rbx
 end
 
--- NewRows with theme support
 function Library:NewRows(parent, title, desc, T)
     local Rows = Library:Create("Frame", {
         Name             = "Rows",
@@ -1124,9 +1093,6 @@ function Library:NewRows(parent, title, desc, T)
     return Rows
 end
 
-------------------------------------------------------------
--- Notification System (module-level, no CoreGui)
-------------------------------------------------------------
 local NotifGui = Library:Create("ScreenGui", {
     Name             = "VitaNotifications",
     Parent           = Library:Parent(),
@@ -1266,9 +1232,6 @@ function Library:Notification(Args)
     return Notif
 end
 
-------------------------------------------------------------
--- Window
-------------------------------------------------------------
 function Library:Window(Args)
     local Title             = Args.Title     or "Vita UI"
     local SubTitle          = Args.SubTitle  or "Made by vita6it"
@@ -1279,7 +1242,6 @@ function Library:Window(Args)
     local ExecIdentifyShown = Args.ExecIdentifyShown ~= false
     local BbIcon            = Args.BbIcon or "rbxassetid://104055321996495"  -- Toggle pill icon
 
-    -- Build theme
     local uT = Args.Theme or {}
     if Args.BG        then uT.Background = Args.BG        end
     if Args.Tab       then uT.TabBg      = Args.Tab       end
@@ -1302,7 +1264,6 @@ function Library:Window(Args)
         PillBg     = ResolveColor(uT.PillBg     or Color3.fromRGB(11, 11, 11)),
     }
 
-    -- Track instances for runtime SetTheme
     local accentRefs    = {}
     local bgRefs        = {}
     local tabImageRefs  = {}
@@ -1314,7 +1275,6 @@ function Library:Window(Args)
     local function trackTabBg(inst, prop)     table.insert(tabBgRefs,     {inst, prop}); return inst end
     local function trackTabStroke(inst, prop) table.insert(tabStrokeRefs, {inst, prop}); return inst end
 
-    -- Main ScreenGui (no CoreGui)
     local Xova = Library:Create("ScreenGui", {
         Name           = "Xova",
         Parent         = Library:Parent(),
@@ -1356,8 +1316,7 @@ function Library:Window(Args)
         end
         return false
     end
-
-    -- Header
+	
     local Header = Library:Create("Frame", {
         Name                   = "Header",
         Parent                 = Background,
@@ -1640,7 +1599,6 @@ function Library:Window(Args)
 
     local PageService = Library:Create("UIPageLayout", { Parent = Scale })
 
-    -- Auto Scale
     local function GetAutoScaleValue()
         local cam = workspace.CurrentCamera
         if not cam then return BaseScale end
@@ -1662,7 +1620,6 @@ function Library:Window(Args)
         end)
     end
 
-    -- Toggle Pill (no CoreGui)
     local ToggleScreen = Library:Create("ScreenGui", {
         Name           = "VitaToggle",
         Parent         = Library:Parent(),
@@ -1707,7 +1664,6 @@ function Library:Window(Args)
         end
     end)
 
-    -- Return button logic
     local ReturnClickBtn = Library:Button(ReturnBtn)
     local function OnReturn()
         ReturnBtn.Visible = false
@@ -1726,7 +1682,6 @@ function Library:Window(Args)
     PageService.TouchInputEnabled       = false
     Library.PageService                 = PageService
 
-    -- Executor Identity Label
     local ExecLabel = Library:Create("TextLabel", {
         Name                   = "ExecIdentity",
         Parent                 = Background,
@@ -1747,16 +1702,14 @@ function Library:Window(Args)
         AutomaticSize          = Enum.AutomaticSize.Y
     })
 
-    -- Window Object
     local Window = {}
 
     function Window:NewPage(Args)
         local PageTitle  = Args.Title or "Page"
         local PageDesc   = Args.Desc  or "Description"
         local PageIcon   = Args.Icon  or 127194456372995
-        local TabImage   = Args.TabImage  -- Per-tab banner image color
+        local TabImage   = Args.TabImage 
 
-        -- Tab card
         local NewTabs = Library:Create("Frame", {
             Name             = "NewTabs",
             Parent           = MainTabsScrolling,
@@ -1883,7 +1836,6 @@ function Library:Window(Args)
             AutomaticSize          = Enum.AutomaticSize.Y
         })
 
-        -- Page frame
         local NewPage = Library:Create("Frame", {
             Name                   = "NewPage",
             Parent                 = Scale,
@@ -1936,7 +1888,6 @@ function Library:Window(Args)
             OnChangePage()
         end)
 
-        -- Page API
         local Page = {}
 
         function Page:Section(Text)
